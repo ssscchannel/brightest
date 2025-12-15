@@ -72,7 +72,7 @@
         }
         .circuit-scene.active { display: block; }
 
-        /* --- 說明面板 (釘在底部) --- */
+        /* --- 說明面板 --- */
         .info-panel {
             position: absolute;  
             bottom: 10px;        
@@ -87,10 +87,10 @@
             border-left: 5px solid #3498db;
             
             max-height: 95px;
-			overflow-y: auto;
-			min-height: 70px;
+            overflow-y: auto;
+            min-height: 70px;
             display: flex; flex-direction: column; justify-content: center;
-            z-index: 20; /* 確保在最上層 */
+            z-index: 20;
         }
         .info-title { font-weight: bold; color: #2980b9; margin-bottom: 5px; display: block;}
         .info-text { font-size: 0.95rem; line-height: 1.4; color: #555; }
@@ -104,8 +104,9 @@
 
         .bulb-wrapper {
             position: absolute; display: flex; flex-direction: column; align-items: center;
-            z-index: 10; cursor: pointer; transition: transform 0.1s;
+            z-index: 10; transition: transform 0.1s;
         }
+        .bulb-wrapper[onclick] { cursor: pointer; }
         .bulb-wrapper:active { transform: scale(0.95); }
 
         .bulb-glass {
@@ -124,10 +125,18 @@
         .lit-normal .bulb-glass { background-color: var(--bulb-norm-color); border-color: #f39c12; box-shadow: 0 0 25px var(--bulb-norm-color), inset -2px -2px 5px rgba(0,0,0,0.1); }
         .lit-bright .bulb-glass { background-color: var(--bulb-bright-color); border-color: #fff; box-shadow: 0 0 50px var(--bulb-bright-color), 0 0 80px rgba(255, 255, 224, 0.9), inset 0 0 10px #fff; }
 
+        /* 燈泡壞掉 (強制變暗) */
+        .bulb-wrapper.is-broken .bulb-glass {
+            background-color: #444 !important;
+            box-shadow: none !important;
+            border-color: #333 !important;
+        }
+
         .battery-group {
             position: absolute; display: flex; align-items: center; z-index: 5;
-            cursor: pointer; transition: transform 0.1s;
+            transition: transform 0.1s;
         }
+        .battery-group[onclick] { cursor: pointer; }
         .battery-group:active { transform: scale(0.95); }
         
         .battery-body {
@@ -145,21 +154,22 @@
         .sign-plus { color: #ff5252; text-shadow: 0 0 4px rgba(255, 82, 82, 0.8); }
         .sign-minus { color: #448aff; text-shadow: 0 0 4px rgba(68, 138, 255, 0.8); }
 
+        /* 電池沒電 (強制變灰) */
+        .battery-group.is-dead .battery-body {
+            background: linear-gradient(to bottom, #7f8c8d, #95a5a6) !important;
+            border-color: #7f8c8d !important;
+        }
+        .battery-group.is-dead .battery-cap { background: #95a5a6 !important; }
+        .battery-group.is-dead .sign-plus, 
+        .battery-group.is-dead .sign-minus { color: #bdc3c7 !important; text-shadow: none !important; }
+
         .polarity { position: absolute; font-size: 14px; font-weight: bold; color: #7f8c8d; pointer-events: none; z-index: 15; }
         .p-pos { color: #e74c3c; } .p-neg { color: #3498db; }
 
         .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 500px; margin-top: 10px; }
         .btn { 
-            padding: 12px; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 0.95rem; 
-            cursor: pointer; 
-            color: white; 
-            transition: all 0.2s; 
-            background: #95a5a6; 
-            font-family: inherit; 
-            line-height: 1.4;
+            padding: 12px; border: none; border-radius: 8px; font-size: 0.95rem; cursor: pointer; color: white; 
+            transition: all 0.2s; background: #95a5a6; font-family: inherit; line-height: 1.4;
         }
         .btn:hover { filter: brightness(1.1); }
         .btn.active { background: #3498db; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transform: translateY(1px); }
@@ -171,19 +181,11 @@
             .mobile-break { display: block; }
 
             .simulation-container { 
-                min-width: 500px;
-                width: 500px;
-                height: 450px;
-                transform: scale(0.65); 
-                transform-origin: top center; 
-                margin-bottom: -150px; 
+                min-width: 500px; width: 500px; height: 450px;
+                transform: scale(0.65); transform-origin: top center; margin-bottom: -150px; 
             } 
-            
             .controls { 
-                width: 500px; 
-                transform: scale(0.65);
-                transform-origin: top center;
-                margin-top: 10px;
+                width: 500px; transform: scale(0.65); transform-origin: top center; margin-top: 10px;
             }
         }
     </style>
@@ -203,10 +205,8 @@
             <div class="wire wire-h" style="width: 240px; top: 40px; left: 130px;"></div>
             <div class="bulb-wrapper" id="a-b1" style="top: 20px; left: 170px;"><div class="bulb-glass"></div><div class="bulb-base"></div></div>
             <div class="bulb-wrapper" id="a-b2" style="top: 20px; left: 290px;"><div class="bulb-glass"></div><div class="bulb-base"></div></div>
-
             <div class="wire wire-v" style="top: 40px; bottom: 140px; left: 130px;"></div>
             <div class="wire wire-v" style="top: 40px; bottom: 140px; right: 130px;"></div>
-
             <div class="wire wire-h" style="width: 240px; bottom: 140px; left: 130px;"></div>
             <div class="battery-group" id="a-bat1" style="bottom: 125px; left: 175px;">
                 <div class="battery-cap"></div><div class="battery-body"><span class="bat-sign sign-plus">+</span><span class="bat-sign sign-minus">-</span></div>
@@ -224,10 +224,13 @@
             <div class="wire wire-v" style="top: 40px; bottom: 140px; left: 130px;"></div>
             <div class="wire wire-v" style="top: 40px; bottom: 140px; right: 130px;"></div>
 
-            <div class="wire wire-h" style="width: 240px; bottom: 200px; left: 130px;"></div> <div class="wire wire-h" style="width: 240px; bottom: 140px; left: 130px;"></div> <div class="battery-group" id="b-bat1" style="bottom: 185px; left: 220px;">
+            <div class="wire wire-h" style="width: 240px; bottom: 200px; left: 130px;"></div> 
+            <div class="wire wire-h" style="width: 240px; bottom: 140px; left: 130px;"></div> 
+            
+            <div class="battery-group" id="b-bat1" style="bottom: 185px; left: 220px;" onclick="toggleState(this)">
                 <div class="battery-cap"></div><div class="battery-body"><span class="bat-sign sign-plus">+</span><span class="bat-sign sign-minus">-</span></div>
             </div>
-            <div class="battery-group" id="b-bat2" style="bottom: 125px; left: 220px;">
+            <div class="battery-group" id="b-bat2" style="bottom: 125px; left: 220px;" onclick="toggleState(this)">
                 <div class="battery-cap"></div><div class="battery-body"><span class="bat-sign sign-plus">+</span><span class="bat-sign sign-minus">-</span></div>
             </div>
         </div>
@@ -235,8 +238,9 @@
         <div class="circuit-scene" id="scene-C">
             <div class="wire wire-h" style="width: 240px; top: 30px; left: 130px;"></div>
             <div class="wire wire-h" style="width: 240px; top: 100px; left: 130px;"></div>
-            <div class="bulb-wrapper" id="c-b1" style="top: 10px; left: 230px;"><div class="bulb-glass"></div><div class="bulb-base"></div></div>
-            <div class="bulb-wrapper" id="c-b2" style="top: 80px; left: 230px;"><div class="bulb-glass"></div><div class="bulb-base"></div></div>
+            
+            <div class="bulb-wrapper" id="c-b1" style="top: 10px; left: 230px;" onclick="toggleState(this)"><div class="bulb-glass"></div><div class="bulb-base"></div></div>
+            <div class="bulb-wrapper" id="c-b2" style="top: 80px; left: 230px;" onclick="toggleState(this)"><div class="bulb-glass"></div><div class="bulb-base"></div></div>
             
             <div class="wire wire-v" style="top: 30px; bottom: 140px; left: 130px;"></div>
             <div class="wire wire-v" style="top: 30px; bottom: 140px; right: 130px;"></div>
@@ -252,8 +256,10 @@
 
         <div class="circuit-scene" id="scene-D">
             <div class="wire wire-h" style="width: 240px; top: 30px; left: 130px;"></div>
-            <div class="wire wire-h" style="width: 240px; top: 90px; left: 130px;"></div> <div class="bulb-wrapper" id="d-b1" style="top: 10px; left: 230px;"><div class="bulb-glass"></div><div class="bulb-base"></div></div>
-            <div class="bulb-wrapper" id="d-b2" style="top: 70px; left: 230px;"><div class="bulb-glass"></div><div class="bulb-base"></div></div>
+            <div class="wire wire-h" style="width: 240px; top: 90px; left: 130px;"></div> 
+            
+            <div class="bulb-wrapper" id="d-b1" style="top: 10px; left: 230px;" onclick="toggleState(this)"><div class="bulb-glass"></div><div class="bulb-base"></div></div>
+            <div class="bulb-wrapper" id="d-b2" style="top: 70px; left: 230px;" onclick="toggleState(this)"><div class="bulb-glass"></div><div class="bulb-base"></div></div>
 
             <div class="wire wire-v" style="top: 30px; bottom: 140px; left: 130px;"></div>
             <div class="wire wire-v" style="top: 30px; bottom: 140px; right: 130px;"></div>
@@ -261,10 +267,10 @@
             <div class="wire wire-h" style="width: 240px; bottom: 200px; left: 130px;"></div>
             <div class="wire wire-h" style="width: 240px; bottom: 140px; left: 130px;"></div>
             
-            <div class="battery-group" id="d-bat1" style="bottom: 185px; left: 220px;">
+            <div class="battery-group" id="d-bat1" style="bottom: 185px; left: 220px;" onclick="toggleState(this)">
                 <div class="battery-cap"></div><div class="battery-body"><span class="bat-sign sign-plus">+</span><span class="bat-sign sign-minus">-</span></div>
             </div>
-            <div class="battery-group" id="d-bat2" style="bottom: 125px; left: 220px;">
+            <div class="battery-group" id="d-bat2" style="bottom: 125px; left: 220px;" onclick="toggleState(this)">
                 <div class="battery-cap"></div><div class="battery-body"><span class="bat-sign sign-plus">+</span><span class="bat-sign sign-minus">-</span></div>
             </div>
         </div>
@@ -298,37 +304,91 @@
             updatePhysics(mode);
         }
 
-        function updatePhysics(mode) {
-            document.querySelectorAll('.bulb-wrapper').forEach(b => {
+        // ★★★ 核心邏輯修改 ★★★
+        function toggleState(element) {
+            const scene = element.closest('.circuit-scene');
+            
+            // 1. 燈泡邏輯：禁止將兩顆都關掉
+            if (element.classList.contains('bulb-wrapper')) {
+                // 如果是「準備關掉」(目前沒壞)，才檢查
+                if (!element.classList.contains('is-broken')) {
+                    const allBulbs = scene.querySelectorAll('.bulb-wrapper');
+                    const brokenBulbs = scene.querySelectorAll('.bulb-wrapper.is-broken');
+                    // 如果壞掉數量 + 1 等於 總數量，表示這次關掉後就全滅了 -> 禁止
+                    if (brokenBulbs.length + 1 >= allBulbs.length) {
+                        return; // 直接結束，不執行 toggle
+                    }
+                }
+                element.classList.toggle('is-broken');
+            } 
+            
+            // 2. 電池邏輯：可以隨意開關
+            else if (element.classList.contains('battery-group')) {
+                element.classList.toggle('is-dead');
+            }
+
+            // 3. 每次點擊後，重新計算電路通斷狀態
+            recalcCircuitState(scene);
+        }
+
+        // 重新計算當前場景的物理狀態
+        function recalcCircuitState(scene) {
+            const sceneId = scene.id;
+            const bulbs = scene.querySelectorAll('.bulb-wrapper');
+            
+            // 檢查電池狀態
+            const allBats = scene.querySelectorAll('.battery-group');
+            const deadBats = scene.querySelectorAll('.battery-group.is-dead');
+            
+            // 只有當「全部電池」都沒電時，才算斷電
+            // (前提是該場景有電池元件，像場景B和D)
+            const isPowerOff = (allBats.length > 0 && allBats.length === deadBats.length);
+
+            bulbs.forEach(b => {
+                // 先移除所有亮度，重置
                 b.classList.remove('lit-dim', 'lit-normal', 'lit-bright');
+
+                // 只有當 (電源有電) 且 (燈泡沒壞) 時，才加回亮度
+                if (!isPowerOff && !b.classList.contains('is-broken')) {
+                    if (sceneId === 'scene-A') b.classList.add('lit-normal');
+                    if (sceneId === 'scene-B') b.classList.add('lit-dim');
+                    if (sceneId === 'scene-C') b.classList.add('lit-bright');
+                    if (sceneId === 'scene-D') b.classList.add('lit-normal');
+                }
+            });
+        }
+
+        function updatePhysics(mode) {
+            // 切換場景時，重置所有狀態為預設 (全亮)
+            document.querySelectorAll('.bulb-wrapper').forEach(b => {
+                b.classList.remove('lit-dim', 'lit-normal', 'lit-bright', 'is-broken');
+            });
+            document.querySelectorAll('.battery-group').forEach(bat => {
+                bat.classList.remove('is-dead');
             });
 
             const title = document.getElementById('infoTitle');
             const text = document.getElementById('infoText');
 
             if (mode === 'A') {
-                // 串串 - 普通
                 document.getElementById('a-b1').classList.add('lit-normal');
                 document.getElementById('a-b2').classList.add('lit-normal');
                 title.innerText = "燈泡串聯 ＋ 電池串聯";
                 text.innerText = "亮度：普通\n電池串聯電力變大，但是兩個燈泡要平分，所以亮度剛剛好\n情況與１顆電池＋１顆燈泡相同";
             
             } else if (mode === 'B') {
-                // 串並 - 最暗
                 document.getElementById('b-b1').classList.add('lit-dim');
                 document.getElementById('b-b2').classList.add('lit-dim');
                 title.innerText = "燈泡串聯 ＋ 電池並聯";
                 text.innerText = "亮度：最暗\n電池並聯，等同１顆電池的電力\n微弱的電力還要分給兩個燈泡，所以最暗";
             
             } else if (mode === 'C') {
-                // 並串 - 最亮
                 document.getElementById('c-b1').classList.add('lit-bright');
                 document.getElementById('c-b2').classList.add('lit-bright');
                 title.innerText = "燈泡並聯 ＋ 電池串聯";
                 text.innerText = "亮度：最亮\n電池串聯電力變大\n並聯的燈泡不用平分電力，每一顆都能吃到飽，所以最亮";
             
             } else if (mode === 'D') {
-                // 並並 - 普通
                 document.getElementById('d-b1').classList.add('lit-normal');
                 document.getElementById('d-b2').classList.add('lit-normal');
                 title.innerText = "燈泡並聯 ＋ 電池並聯";
@@ -337,5 +397,4 @@
         }
     </script>
 </body>
-
 </html>
