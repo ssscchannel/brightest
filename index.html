@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>晟自然電路實驗室：哪種接法燈泡最亮？</title>
+    <title>晟自然輔助系統　電路實驗室</title>
     <style>
+        /* --- 核心變數 (保留原電路模擬設定) --- */
         :root {
             --wire-color: #333;
-            --bg-color: #f4f6f9;
+            --bg-color: #f0f4f8; /* 同步 index 背景色調 */
             --panel-color: #ffffff;
             --bulb-off: #bdc3c7;
             --bulb-dim-color: #d35400;   /* 最暗 */
@@ -15,44 +16,91 @@
             --bulb-bright-color: #fff700;/* 最亮 */
         }
 
+        /* --- 1. 背景鎖定技術 (源自 index.html) --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            color: #333;
+            margin: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative; /* 建立定位基準 */
+        }
+
+        body::before {
+            content: "";
+            position: fixed; /* 強制固定背景，不隨內容滾動 */
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
             background-image: url('page.jpg'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-color: rgba(255, 255, 255, 0.8);
-            
-            display: flex; flex-direction: column; align-items: center;
-            margin: 0; padding: 20px; color: #333;
-            min-height: 100vh;
-            overflow-x: hidden;
+            z-index: -1; /* 置於內容最底層 */
+            background-color: rgba(255, 255, 255, 0.8); /* 保持原有的遮罩效果 */
         }
 
-        /* --- 標題風格 --- */
+        /* --- 2. 標題區塊標準化 (源自 index.html) --- */
         .header-container { 
             display: flex; align-items: center; justify-content: center;   
-            gap: 15px; margin-top: 20px; margin-bottom: 20px;
-            flex-wrap: wrap;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 10px 25px; border-radius: 50px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            max-width: 95%;
+            gap: 10px; margin-top: 15px; margin-bottom: 10px;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 8px 20px; border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 600px; width: 95%; 
+            box-sizing: border-box;
+            flex-wrap: nowrap; /* 防止標題換行過於隨意 */
         }
         
-        .title-logo { height: 60px; width: auto; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2)); }
+        .title-logo { height: 36px; width: auto; } /* 同步 index 大小 */
         
         h1 { 
-            margin: 0; color: #2c3e50; text-shadow: none; 
-            line-height: 1.2; font-size: 1.5rem; 
-            text-align: center;
+            margin: 0; color: #2c3e50; 
+            font-size: 1.2rem; /* 同步 index 字體大小 */
+            text-align: center; 
+            white-space: nowrap; 
         }
-        
-        .mobile-break { display: none; }
-        .subtitle { font-size: 0.9em; color: #7f8c8d; margin-top: 0; font-weight: normal; }
 
-        /* --- 主容器 --- */
+        /* --- 3. 外部連結按鈕 (源自 index.html) --- */
+        .external-link-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: #fff;
+            padding: 6px 18px; 
+            font-size: 0.9rem; 
+            border-radius: 50px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 8px rgba(52, 152, 219, 0.4);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .external-link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(52, 152, 219, 0.6);
+            background: linear-gradient(135deg, #2980b9 0%, #2c3e50 100%);
+        }
+        .external-link-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* 副標題樣式 */
+        .subtitle { 
+            color: #7f8c8d; margin-bottom: 15px; font-size: 0.9rem; text-align: center; margin-top: 0;
+        }
+        .mobile-break { display: none; }
+
+        /* --- 主容器 (保持原樣，微調 Margin) --- */
         .simulation-container {
             position: relative;
             width: 500px; height: 450px;
@@ -64,28 +112,26 @@
             overflow: hidden; 
             transition: all 0.3s ease;
             z-index: 1;
+            /* margin-bottom 由外部控制，不強制 */
         }
 
-        /* --- 電路場景 --- */
+        /* --- 以下為原電路模擬樣式，未做邏輯更動 --- */
         .circuit-scene {
             position: relative; width: 100%; height: 100%; display: none;
         }
         .circuit-scene.active { display: block; }
 
-        /* --- 說明面板 --- */
         .info-panel {
             position: absolute;  
             bottom: 10px;        
             left: 50%;           
             transform: translateX(-50%); 
-            
             background: #ecf0f1;
             width: 90%;
             padding: 8px 10px;
             border-radius: 10px;
             text-align: center;
             border-left: 5px solid #3498db;
-            
             max-height: 95px;
             overflow-y: auto;
             min-height: 70px;
@@ -95,7 +141,6 @@
         .info-title { font-weight: bold; color: #2980b9; margin-bottom: 5px; display: block;}
         .info-text { font-size: 0.95rem; line-height: 1.4; color: #555; }
 
-        /* --- 元件設定 --- */
         .wire {
             position: absolute; background-image: linear-gradient(0deg, #2c3e50, #5d6d7e 40%, #85929e 60%, #2c3e50);
             border-radius: 4px; z-index: 1; box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
@@ -120,12 +165,10 @@
             background-image: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.2) 3px, rgba(0,0,0,0.2) 4px);
         }
         
-        /* 亮度分級 */
         .lit-dim .bulb-glass { background-color: var(--bulb-dim-color); border-color: #d35400; box-shadow: 0 0 5px var(--bulb-dim-color), inset -2px -2px 5px rgba(0,0,0,0.1); }
         .lit-normal .bulb-glass { background-color: var(--bulb-norm-color); border-color: #f39c12; box-shadow: 0 0 25px var(--bulb-norm-color), inset -2px -2px 5px rgba(0,0,0,0.1); }
         .lit-bright .bulb-glass { background-color: var(--bulb-bright-color); border-color: #fff; box-shadow: 0 0 50px var(--bulb-bright-color), 0 0 80px rgba(255, 255, 224, 0.9), inset 0 0 10px #fff; }
 
-        /* 燈泡壞掉 (強制變暗) */
         .bulb-wrapper.is-broken .bulb-glass {
             background-color: #444 !important;
             box-shadow: none !important;
@@ -154,7 +197,6 @@
         .sign-plus { color: #ff5252; text-shadow: 0 0 4px rgba(255, 82, 82, 0.8); }
         .sign-minus { color: #448aff; text-shadow: 0 0 4px rgba(68, 138, 255, 0.8); }
 
-        /* 電池沒電 (強制變灰) */
         .battery-group.is-dead .battery-body {
             background: linear-gradient(to bottom, #7f8c8d, #95a5a6) !important;
             border-color: #7f8c8d !important;
@@ -163,10 +205,7 @@
         .battery-group.is-dead .sign-plus, 
         .battery-group.is-dead .sign-minus { color: #bdc3c7 !important; text-shadow: none !important; }
 
-        .polarity { position: absolute; font-size: 14px; font-weight: bold; color: #7f8c8d; pointer-events: none; z-index: 15; }
-        .p-pos { color: #e74c3c; } .p-neg { color: #3498db; }
-
-        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 500px; margin-top: 10px; }
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 500px; margin-top: 10px; margin-bottom: 30px;}
         .btn { 
             padding: 12px; border: none; border-radius: 8px; font-size: 0.95rem; cursor: pointer; color: white; 
             transition: all 0.2s; background: #95a5a6; font-family: inherit; line-height: 1.4;
@@ -175,10 +214,10 @@
         .btn.active { background: #3498db; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transform: translateY(1px); }
         
         @media (max-width: 600px) {
-            .title-logo { height: 40px; }
-            h1 { font-size: 1.4rem; }
-            .header-container { gap: 5px; padding: 10px 20px; border-radius: 15px; width: 95%; box-sizing: border-box;}
-            .mobile-break { display: block; }
+            h1 { font-size: 1.1rem; }
+            .title-logo { height: 28px; }
+            .header-container { padding: 8px 15px; }
+            .mobile-break { display: inline; }
 
             .simulation-container { 
                 min-width: 500px; width: 500px; height: 450px;
@@ -194,10 +233,14 @@
 
     <div class="header-container">
 	    <img src="logo.jpg" alt="Logo" class="title-logo" onerror="this.style.display='none'">
-        <h1>晟自然電路實驗室　<br class="mobile-break">哪一種接法燈泡最亮？</h1>
+        <h1>晟自然輔助系統　<br class="mobile-break">哪一種接法燈泡最亮？</h1>
     </div>
-	
-	<p class="subtitle" id="mainSubtitle">請點擊下方按鈕，比較燈泡亮度</p>
+    
+    <a href="https://line.me/ti/g2/TTCqPpZP6lQqX1z_AUDPNm4977Dvylew3O7oBg?utm_source=invitation&utm_medium=link_copy&utm_campaign=default" target="_blank" class="external-link-btn">
+        <span>👉</span> 加 LINE 免費提問
+    </a>
+
+    <p class="subtitle" id="mainSubtitle">請點擊下方按鈕，比較燈泡亮度</p>
 
     <div class="simulation-container">
         
@@ -304,7 +347,7 @@
             updatePhysics(mode);
         }
 
-        // ★★★ 核心邏輯修改 ★★★
+        // ★★★ 核心邏輯 (完全保留) ★★★
         function toggleState(element) {
             const scene = element.closest('.circuit-scene');
             
