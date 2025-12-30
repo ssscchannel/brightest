@@ -16,70 +16,114 @@
             --bulb-bright-color: #fff700;/* 最亮 */
         }
 
-        /* --- 1. 背景鎖定技術 (源自 index.html) --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-            color: #333;
-            margin: 0;
-            overflow-x: hidden;
-            min-height: 100vh;
-            position: relative; /* 建立定位基準 */
-        }
-
-        body::before {
-            content: "";
-            position: fixed; /* 強制固定背景，不隨內容滾動 */
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%;
             background-image: url('page.jpg'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            z-index: -1; /* 置於內容最底層 */
-            background-color: rgba(255, 255, 255, 0.8); /* 保持原有的遮罩效果 */
+            background-attachment: fixed;
+            background-color: #f0f2f5;
+            
+            display: flex; flex-direction: column; align-items: center;
+            /* 修改：減少上下邊距，盡量讓內容塞進一頁 */
+            margin: 0; padding: 5px; 
+            height: 100vh;       /* 舊手機相容 */
+            height: 100dvh;      /* 關鍵：扣除工具列後的實際高度 */
+            overflow: hidden;    /* 禁止產生任何捲軸 */
+            touch-action: manipulation;
         }
 
-        /* --- 2. 標題區塊標準化 (源自 index.html) --- */
-        .header-container { 
-            display: flex; align-items: center; justify-content: center;   
-            gap: 10px; margin-top: 15px; margin-bottom: 10px;
-            background-color: rgba(255, 255, 255, 0.95);
-            padding: 8px 20px; border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            max-width: 600px; width: 95%; 
-            box-sizing: border-box;
-            flex-wrap: nowrap; /* 防止標題換行過於隨意 */
+        /* --- 標題區 (手機版緊湊化) --- */
+        .header-container {
+            flex-shrink: 0; /* 禁止被壓縮 */
+            width: 97%;     /* 稍微留邊 */
+			box-sizing: border-box; /* 確保 padding 不會讓它變更寬 */
+            max-width: 800px;
+            
+            /* 讓標題在左，按鈕在右 */
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            
+            /* 視覺美化 */
+            padding: 8px 15px;
+            margin-top: 5px;
+			margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.9); /* 90% 不透明度 */
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* 立體陰影 */
+            z-index: 1000;
         }
-        
-        .title-logo { height: 36px; width: auto; } /* 同步 index 大小 */
-        
-        h1 { 
-            margin: 0; color: #2c3e50; 
-            font-size: 1.2rem; /* 同步 index 字體大小 */
-            text-align: center; 
-            white-space: nowrap; 
+		
+        .title-logo {
+            height: 36px; /* 限制高度，避免撐開 */
+            width: auto;
+            border-radius: 4px;
+        }
+        .header-container h1 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #333;
+            line-height: 1.3;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Logo 與文字間距 */
+        }
+		
+		/* =========================================
+           3. 右上角按鈕群 (新功能)
+           ========================================= */
+        .nav-buttons {
+            display: flex;
+            gap: 8px; /* 按鈕之間的間距 */
+        }
+		
+		/* 精緻化的 LINE 按鈕 (膠囊狀) */
+        .header-btn {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            background: #06c755; /* LINE 的官方綠色 */
+            color: white;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border-radius: 20px; /* 圓角膠囊 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s, background 0.2s;
+            white-space: nowrap; /* 禁止文字換行 */
+        }
+		
+		.header-btn:active {
+            transform: scale(0.95);
         }
 
-        /* --- 3. 外部連結按鈕 (源自 index.html) --- */
+        .header-btn span {
+            margin-right: 4px; /* 圖示與文字距離 */
+        }
+
+        /* --- 新增：外部連結按鈕 (移植自 index.html) --- */
         .external-link-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 6px; 
             text-decoration: none;
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
             color: #fff;
+            
+            /* 樣式保持一致 */
             padding: 6px 18px; 
             font-size: 0.9rem; 
+            
             border-radius: 50px;
             font-weight: bold;
-            margin-bottom: 20px;
+            /* 微調：針對此檔案較緊湊的佈局，將原 margin-bottom: 20px 微調為 10px */
+            margin-bottom: 10px;
             box-shadow: 0 3px 8px rgba(52, 152, 219, 0.4);
             transition: all 0.2s ease;
             cursor: pointer;
@@ -93,12 +137,39 @@
         .external-link-btn:active {
             transform: scale(0.98);
         }
-
-        /* 副標題樣式 */
-        .subtitle { 
-            color: #7f8c8d; margin-bottom: 15px; font-size: 0.9rem; text-align: center; margin-top: 0;
-        }
-        .mobile-break { display: none; }
+		
+		/* --- 教學引導任務條樣式 --- */
+		.instruction-bar {
+		    /* 定位與佈局 */
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px; /* 圖示與文字間距 */
+			
+			/* 尺寸限制，與標題區保持視覺協調 */
+			max-width: 90%;
+			width: fit-content; /* 內容多寬就多寬，不要自動撐滿整行 */
+			margin: -5px auto 15px auto; /* 負邊距將其向上拉近標題，下方留出呼吸空間 */
+			
+			/* 外觀設計 - 輕量化 */
+			padding: 6px 20px;
+			background-color: rgba(255, 255, 255, 0.85); /* 比標題區更通透 */
+			border-radius: 20px; /* 圓潤的膠囊狀 */
+			box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* 極輕微的陰影 */
+			backdrop-filter: blur(4px); /* 毛玻璃效果，增加質感 */
+			
+			/* 文字設定 */
+			color: #555; /* 深灰色，不搶黑色標題的戲 */
+			font-size: 0.9rem;
+			font-weight: 500;
+			line-height: 1.4;
+			text-align: center;
+			pointer-events: none; /* 讓滑鼠可以直接穿透，不會阻擋操作 */
+		}
+		
+		.instruction-bar .icon {
+    		font-size: 1rem; /* 圖示稍微大一點 */
+		}
 
         /* --- 主容器 (保持原樣，微調 Margin) --- */
         .simulation-container {
@@ -213,11 +284,24 @@
         .btn:hover { filter: brightness(1.1); }
         .btn.active { background: #3498db; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transform: translateY(1px); }
         
+		/* RWD: 手機直式時，標題過長自動換行 */
+        .mobile-break { display: none; }
+        
         @media (max-width: 600px) {
-            h1 { font-size: 1.1rem; }
-            .title-logo { height: 28px; }
-            .header-container { padding: 8px 15px; }
-            .mobile-break { display: inline; }
+            .mobile-break { display: block; height: 0; }
+            .header-container h1 { font-size: 1rem; }
+            .header-btn { padding: 5px 10px; font-size: 0.85rem; }
+            .header-btn span { display: none; } /* 手機版太窄時，隱藏手指圖示 */
+			.instruction-bar {
+    			font-size: 0.8rem; /* 手機字體縮小 */
+				padding: 5px 15px;
+				width: 90%; /* 手機上寬度稍微放寬 */
+				margin-top: 5px; /* 手機版不使用負邊距，避免太擁擠 */
+				margin-bottom: 10px;
+				flex-direction: row; /* 保持水平排列 */
+				flex-wrap: nowrap; /* 盡量不換行，若字太多會自動縮小 */
+				}
+        }
 
             .simulation-container { 
                 min-width: 500px; width: 500px; height: 450px;
@@ -231,16 +315,26 @@
 </head>
 <body>
 
-    <div class="header-container">
-	    <img src="logo.jpg" alt="Logo" class="title-logo" onerror="this.style.display='none'">
-        <h1>晟自然輔助系統　<br class="mobile-break">哪一種接法燈泡最亮？</h1>
-    </div>
-    
-    <a href="https://line.me/ti/g2/TTCqPpZP6lQqX1z_AUDPNm4977Dvylew3O7oBg?utm_source=invitation&utm_medium=link_copy&utm_campaign=default" target="_blank" class="external-link-btn">
-        <span>👉</span> 加 LINE 免費提問
-    </a>
+	<div class="header-container">
+        <h1>
+            <img src="logo.jpg" alt="Logo" class="title-logo" onerror="this.style.display='none'">
+            <div>
+                晟自然輔助系統　<span class="mobile-break"></span>比較串聯與並聯的差異
+            </div>
+        </h1>
 
-    <p class="subtitle" id="mainSubtitle">請點擊下方按鈕，比較燈泡亮度</p>
+        <div class="nav-buttons">
+            <a href="https://line.me/ti/g2/TTCqPpZP6lQqX1z_AUDPNm4977Dvylew3O7oBg" target="_blank" class="header-btn" title="加入官方LINE">
+                <span>👉</span>加 LINE 提問
+            </a>
+            
+            </div>
+    </div>
+
+    <div class="instruction-bar">
+	    <span class="icon">💡</span>
+		<span>請點擊下方按鈕，比較燈泡亮度</span>
+	</div>
 
     <div class="simulation-container">
         
@@ -333,7 +427,40 @@
     </div>
 
     <script>
-        window.onload = function() {
+        // 【晟自然系統：自動視窗適配模組】
+		function autoFitSimulation() {
+    		// 1. 取得標準邏輯寬度
+			const logicalWidth = 500; 
+			const logicalHeight = 450;
+			
+			// 2. 抓取當前螢幕寬度 (限制最大不超過 500px，以免電腦版過大)
+			const screenWidth = Math.min(window.innerWidth, 500);
+			
+			// 3. 計算精確縮放比例 (例如: 手機寬 375 / 邏輯寬 500 = 0.75)
+			// 扣除 20px 是為了左右留一點呼吸空間，若想全滿可移除 "- 20"
+			const scale = (screenWidth - 20) / logicalWidth; 
+			
+			// 4. 動態修正 CSS
+			const container = document.querySelector('.simulation-container');
+			const controls = document.querySelector('.controls');
+			
+			// 計算縮放後產生的底部空隙，自動補正 margin-bottom
+			const ghostSpace = logicalHeight * (1 - scale);
+			
+			if (container) {
+			container.style.transform = `scale(${scale})`;
+			container.style.marginBottom = `-${ghostSpace}px`;
+			}
+			if (controls) {
+			controls.style.transform = `scale(${scale})`;
+			}
+		}
+		
+		// 執行適配 (載入時與旋轉螢幕時)
+		window.addEventListener('load', autoFitSimulation);
+		window.addEventListener('resize', autoFitSimulation);
+		
+		window.onload = function() {
             switchScene('A', document.querySelector('.btn'));
         }
 
